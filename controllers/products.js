@@ -10,7 +10,7 @@ exports.getAddProduct = (req, res) => {
   });
 };
 
-exports.postAddProduct = (req, res, next) => {
+exports.postAddProduct = (req, res) => {
   const prod = new Product(req.body.title);
   prod.save();
   res.redirect("/");
@@ -18,7 +18,7 @@ exports.postAddProduct = (req, res, next) => {
 
 exports.getProducts = (req, res) => {
   const allProducts = Product.fetchAll();
-
+  console.log(allProducts);
   res.render("shop", {
     prods: allProducts,
     pageTitle: "Shop",
