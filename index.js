@@ -2,9 +2,10 @@ const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 
-const adminRoutes = require("./routes/admin");
-const shopRoutes = require("./routes/shop");
 const rootDir = require("./utils/path");
+const shopRoutes = require("./routes/shop");
+const adminRoutes = require("./routes/admin");
+const sequelizeInstance = require("./utils/database");
 const getFallbackPage = require("./controllers/fallback");
 
 const app = express();
@@ -23,4 +24,7 @@ app.use("/", shopRoutes);
 
 app.use(getFallbackPage);
 
-app.listen(3000);
+sequelizeInstance
+  .sync()
+  .then(() => app.listen(3000))
+  .catch(console.log);
