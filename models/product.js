@@ -1,4 +1,19 @@
 const { DataTypes } = require("sequelize");
+const { getDatabase } = require("../utils/database");
+
+class Product {
+  constructor(title, price, imageUrl, description) {
+    this.title = title;
+    this.price = price;
+    this.imageUrl = imageUrl;
+    this.description = description;
+  }
+
+  async save() {
+    const db = getDatabase();
+    await db.collection("products").insertOne(this);
+  }
+}
 
 const sequelizeInstance = require("../utils/database");
 
