@@ -1,10 +1,10 @@
-const { MongoClient } = require("mongodb");
+import { MongoClient, Db } from "mongodb";
 
 const dbName = "academind-nodejs";
 const url = "mongodb://localhost:27017";
 
 const client = new MongoClient(url);
-let db;
+let db: Db;
 
 async function connectToMongo() {
   try {
@@ -21,4 +21,4 @@ function getDatabase() {
   else return db;
 }
 
-module.exports = { connectToMongo, getDatabase };
+export { connectToMongo, getDatabase };
