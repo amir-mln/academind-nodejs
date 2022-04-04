@@ -1,4 +1,3 @@
 import { dirname } from "path";
 
-// @ts-ignore
-export default dirname(require.main.filename); // Maximilian uses 'process.mainModule.filename' which is deprecated
+export default dirname(require.main!.filename).replace(/[\\\/]src$/, ""); // Maximilian uses 'process.mainModule.filename' which is deprecated

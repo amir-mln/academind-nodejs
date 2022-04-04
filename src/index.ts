@@ -4,37 +4,51 @@ import bodyParser from "body-parser";
 
 import rootDir from "@utils/path";
 import { connectToMongo } from "@utils/database";
-// import shopRoutes from "./routes/shop";
-// import adminRoutes from "./routes/admin";
-// import getFallbackPage from "./controllers/fallback";
+
+import shopRoutes from "@routes/shop";
+import adminRoutes from "@routes/admin";
+import getFallbackPage from "@controllers/fallback";
+import User from "@models/user";
 
 const app = express();
 
 app.set("view engine", "ejs");
 
-app.set("views", "views");
+app.set("views", path.join(__dirname, "views"));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(rootDir, "public")));
 
-// TODO: Delete this after rewriting every file to typescript
-app.use("/", (req, res) => res.send("<h1>hello</h1>"));
+app.use(async (req, res, next) => {
+  try {
+    const adminUser = await User.findByUserInfo({ accessLvl: "admin" });
+    // @ts-ignore
+    if (adminUser) req.user = adminUser;
+  } catch {
+    console.log("found no user");
+  }
+  next();
+});
 
-// app.use(async (req, res, next) => {
-//   try {
-//     const user = await User.findByPk(1);
-//     if (user) req.user = user;
-//   } catch {
-//     console.log("found no user");
-//   }
-//   next();
-// });
+app.use("/admin", adminRoutes);
 
-// app.use("/admin", adminRoutes);
+app.use("/", shopRoutes);
 
-// app.use("/", shopRoutes);
+app.use(getFallbackPage);
 
-// app.use(getFallbackPage);
-
-connectToMongo().then(() => app.listen(3000));
+connectToMongo().then(async () => {
+  try {
+    const adminUser = await User.findByUserInfo({ accessLvl: "admin" });
+    if (!adminUser)
+      await User.createUser({
+        username: "admin",
+        email: "some@some",
+        password: "1234",
+        accessLvl: "admin",
+      });
+    app.listen(3000);
+  } catch {
+    console.log("could not find or create admin user");
+  }
+});

@@ -9,7 +9,6 @@ let db: Db;
 async function connectToMongo() {
   try {
     await client.connect();
-    db = client.db(dbName);
   } catch {
     client.close();
     console.error("Couldn't connect to database");
@@ -17,8 +16,8 @@ async function connectToMongo() {
 }
 
 function getDatabase() {
-  if (!db) console.error("you need to connect to the database first!");
-  else return db;
+  if (!db) db = client.db(dbName);
+  return db;
 }
 
 export { connectToMongo, getDatabase };
