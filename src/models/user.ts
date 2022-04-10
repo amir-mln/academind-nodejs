@@ -1,36 +1,45 @@
 import { getDatabase } from "@utils/database";
-import withObjectId from "@utils/with-object-id";
 
 import type { ObjectId } from "mongodb";
+import type { Cart, UserOrderItem, UserType } from "@customTypes/user-types";
+import withObjectId from "@utils/with-object-id";
+import { OrderType } from "@customTypes/order-types";
 
-type userProps = {
-  username: string;
-  email: string;
-  password: string;
-  accessLvl: "admin" | "user";
-};
+class User {
+  private static adminUserId: ObjectId;
+  private static db = getDatabase();
+  private static collection = this.db.collection<UserType>("users");
 
-const User = (function () {
-  const db = getDatabase();
-  const collection = db.collection("users");
-
-  function createUser(user: userProps) {
-    return collection.insertOne(user);
+  static set defaultUserId(_id: ObjectId) {
+    this.adminUserId = _id;
   }
 
-  function findById(_id: ObjectId) {
-    return collection.find({ _id }).next();
+  static get defaultUserId() {
+    return this.adminUserId;
   }
 
-  function findByUserInfo(userInfo: Partial<userProps>) {
-    return collection.find(userInfo).next();
+  static createUser(user: UserType) {
+    return this.collection.insertOne(user);
   }
 
-  return {
-    createUser: createUser,
-    findByUserInfo: findByUserInfo,
-    findById: withObjectId<ReturnType<typeof findById>>(findById),
-  };
-})();
+  static findById(_id: ObjectId) {
+    return this.collection.find({ _id }).next();
+  }
+
+  static findByUserInfo(userInfo: Partial<UserType>) {
+    return this.collection.find(userInfo).next();
+  }
+
+  static updateCart(_id: ObjectId, newCart: Cart) {
+    return this.collection.updateOne({ _id }, { $set: { cart: newCart } });
+  }
+
+  static addOrder(userId: ObjectId, newOrder: UserOrderItem) {
+    return this.collection.updateOne(
+      { _id: userId },
+      { $push: { orders: newOrder } }
+    );
+  }
+}
 
 export default User;

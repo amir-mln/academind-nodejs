@@ -1,47 +1,40 @@
 import { getDatabase } from "@utils/database";
 import withObjectId from "@utils/with-object-id";
 
-import type { ObjectId } from "mongodb";
+import type { Filter, ObjectId } from "mongodb";
+import type { ProductProps } from "@customTypes/product-types";
+import { type } from "os";
 
-type productProps = {
-  title: string;
-  price: string;
-  imageUrl: string;
-  description: string;
-  userId: string;
-};
+class Product {
+  private static db = getDatabase();
+  private static collection = this.db.collection<ProductProps>("products");
 
-const Product = (function () {
-  const db = getDatabase();
-  const collection = db.collection("products");
-
-  function findAll() {
-    return collection.find().toArray();
+  static findAll(filterObj: Filter<ProductProps> = {}) {
+    return this.collection.find(filterObj).toArray();
   }
 
-  function insertOne(product: productProps) {
-    return collection.insertOne(product);
+  static insertOne(product: ProductProps) {
+    return this.collection.insertOne(product);
   }
 
-  function findOneById(_id: ObjectId) {
-    return collection.findOne({ _id });
-  }
+  static findOneById = withObjectId((params: { _id: ObjectId }) => {
+    return this.collection.findOne({ _id: params._id });
+  });
 
-  function updateOne(_id: ObjectId, newDoc: productProps) {
-    return collection.updateOne({ _id }, { $set: newDoc });
-  }
+  static updateOne = withObjectId(
+    (params: { _id: ObjectId; newDoc: ProductProps }) => {
+      return this.collection.updateOne(
+        { _id: params._id },
+        { $set: params.newDoc }
+      );
+    }
+  );
 
-  function deleteOne(_id: ObjectId) {
-    return collection.deleteOne({ _id });
-  }
-
-  return {
-    findAll: findAll,
-    insertOne: insertOne,
-    updateOne: withObjectId<ReturnType<typeof updateOne>>(updateOne),
-    deleteOne: withObjectId<ReturnType<typeof deleteOne>>(deleteOne),
-    findOneById: withObjectId<ReturnType<typeof findOneById>>(findOneById),
-  };
-})();
+  static deleteOne = withObjectId((params: { _id: ObjectId }) => {
+    return this.collection.deleteOne({ _id: params._id });
+  });
+}
 
 export default Product;
+
+type x = Omit<{ _id: ObjectId; newDoc: ProductProps }, "_id">;

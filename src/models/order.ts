@@ -1,14 +1,17 @@
-const { DataTypes } = require("sequelize");
+import { getDatabase } from "@utils/database";
+import type { OrderType } from "@customTypes/order-types";
+import type { Filter } from "mongodb";
 
-const sequelizeInstance = require("../utils/database");
+class Order {
+  private static db = getDatabase();
+  private static collection = this.db.collection<OrderType>("orders");
 
-const Order = sequelizeInstance.define("order", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true,
-  },
-});
+  static find(orderFilter: Filter<OrderType>) {
+    return this.collection.find(orderFilter).toArray();
+  }
+  static insertOne(order: OrderType) {
+    return this.collection.insertOne(order);
+  }
+}
 
-module.exports = Order;
+export default Order;

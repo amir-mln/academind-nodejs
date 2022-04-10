@@ -1,11 +1,13 @@
-import Product from "../models/product";
+import Product from "@models/product";
+import User from "@models/user";
+
 import type { Request, Response } from "express";
 
 export function getProducts(req: Request, res: Response) {
   Product.findAll()
-    .then((products) => {
+    .then((prods) => {
       res.render("admin/products", {
-        prods: products,
+        prods,
         pageTitle: "Admin Products",
         path: "/admin/products",
       });
@@ -22,8 +24,8 @@ export function getAddProduct(req: Request, res: Response) {
 }
 
 export function postAddProduct(req: Request, res: Response) {
-  // @ts-ignore
-  Product.insertOne({ ...req.body, userId: req.user._id })
+  const userId = User.defaultUserId;
+  Product.insertOne({ ...req.body, userId: userId.toString() })
     .then(() => res.redirect("/products"))
     .catch(console.log);
 }
@@ -36,7 +38,7 @@ export function getEditProduct(req: Request, res: Response) {
     return res.redirect("/");
   }
 
-  Product.findOneById(prodId)
+  Product.findOneById({ _id: prodId })
     .then((product) => {
       !product
         ? res.redirect("/")
@@ -53,7 +55,7 @@ export function getEditProduct(req: Request, res: Response) {
 export function postEditProduct(req: Request, res: Response) {
   const { productId: prodId, ...productNewProps } = req.body;
 
-  Product.updateOne(prodId, productNewProps)
+  Product.updateOne({ _id: prodId, newDoc: productNewProps })
     .then(() => res.redirect("/admin/products"))
     .catch(() => res.redirect("/404"));
 }

@@ -1,8 +1,15 @@
-import path from "path";
-
 import express from "express";
 
-import { getProducts, getProduct, getIndex } from "../controllers/shop";
+import {
+  getProducts,
+  getProduct,
+  getIndex,
+  getCart,
+  getOrders,
+  postCart,
+  postCartDeleteProduct,
+  postOrder,
+} from "@controllers/shop";
 
 const router = express.Router();
 
@@ -12,16 +19,14 @@ router.get("/products", getProducts);
 
 router.get("/products/:productId", getProduct);
 
-// router.get("/cart", getCart);
+router.get("/cart", getCart);
 
-// router.post("/cart", postCart);
+router.post("/cart", postCart);
 
-// router.post("/cart-delete-item", postCartDeleteProduct);
+router.post("/cart-delete-item", postCartDeleteProduct);
 
-// router.get("/orders", getOrders);
+router.get("/orders", getOrders);
 
-// router.post("/create-order", postOrder);
-
-// router.get("/checkout", getCheckout);
+router.post("/create-order", postOrder);
 
 export default router;
