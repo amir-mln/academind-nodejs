@@ -1,4 +1,4 @@
-import type { ObjectId, WithId } from "mongodb";
+import type { ObjectId } from "mongodb";
 
 export type CartItem = { productId: ObjectId; quantity: number };
 

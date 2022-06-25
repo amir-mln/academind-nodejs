@@ -39,7 +39,7 @@
     // "typeRoots": [],
     // "types": [],
     // "allowUmdGlobalAccess": true,
-    // "resolveJsonModule": true,
+    "resolveJsonModule": true,
     // "noResolve": true,
 
     /* JavaScript Support */
